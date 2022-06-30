@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     //
-
-    public function login(Request $req){
+    //teacher login   
+     public function teacherLogin(Request $req){
         if($req->isMethod("post")){
+
             $req->validate([
                 'email' => 'required',
                 'password' => 'required',
@@ -22,7 +23,32 @@ class AuthController extends Controller
 
             $auth = $req->only("email","password");
 
-            if(Auth::attempt($auth)){
+            if(Auth::guard("teacher")->attempt($auth)){
+                return redirect()->route("admin.index");
+            }
+            else{
+                $req->session()->flash("error","Teacher with incorrect details try again");
+                return redirect()->back();
+            }
+
+
+        }
+        return view("admin.login");
+
+    }
+
+    //student Login
+    public function login(Request $req){
+        if($req->isMethod("post")){
+            
+            $req->validate([
+                'email' => 'required',
+                'password' => 'required',
+            ]);
+
+            $auth = $req->only("email","password");
+
+            if(Auth::guard("web")->attempt($auth)){
                 return redirect()->route("student.index");
             }
             else{
